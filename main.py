@@ -5,7 +5,6 @@ file = open('creds', 'r')
 credentials = file.read().split('\n')
 file.close()
 bot = TelegramClient("1",credentials[0], credentials[1]).start(bot_token=credentials[2])
-
 startkeyboardintern = [[Button.inline("Добавить день", b"1"), Button.inline("Посмотреть неделю", b"2")], [Button.inline("Всё расписание", b"3"), Button.inline("Экспорт в .xlsx", b"4")]]
 startkeyboardadmin = [[Button.inline("Изменить день", b"1"), Button.inline("Всё расписание", b"2")], [Button.inline("Экспорт в .xlsx", b"4")]]
 @bot.on(events.NewMessage(incoming=True, pattern='/start'))
@@ -17,9 +16,9 @@ async def send_command_handler(send_event):
     payload = {}
     await send_event.answer()
     day = getweek()
-    kbdays = [[Button.inline(day[0], bytes(day[0], 'utf8'))],[Button.inline(day[1], bytes(day[1], 'utf8'))],[Button.inline(day[2], bytes(day[2], 'utf8'))],[Button.inline(day[3], bytes(day[3], 'utf8'))],[Button.inline(day[4], bytes(day[4], 'utf8'))]]
+    kbdays = [[Button.inline(day[0], b"d1")],[Button.inline(day[1], b"d2")],[Button.inline(day[2], b"d3")],[Button.inline(day[3], b"d4")],[Button.inline(day[4], b"d5")]]
     await bot.send_message(send_event.query.user_id, 'Выбери день', buttons=kbdays)
-    @bot.on(events.CallbackQuery(data2=bytes(re.match(r""+re.escape(day[0])+r"|"+re.escape(day[1])+r"|"+re.escape(day[2])+r"|"+re.escape(day[3])+r"|"+re.escape(day[4])+r"|"), 'utf8')))
+    @bot.on(events.CallbackQuery(data=re.findall(b'd1|d2|d3|d4|d5')))
     async def send_commandday_handler(send_event):
         await send_event.answer()
         await bot.send_message(send_event.query.user_id, 'Выбери жизн')
