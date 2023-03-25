@@ -1,6 +1,6 @@
 from telethon import TelegramClient, events, sync, Button
 import re
-from func import getweek
+from func import getweek, saveday
 file = open('creds', 'r')
 credentials = file.read().split('\n')
 file.close()
@@ -14,7 +14,6 @@ async def handler(event):
 @bot.on(events.CallbackQuery(data=b'1'))
 async def send_command_handler(send_event):
     workday = {}
-    await send_event.answer()
     day = getweek()
     kbdays = [[Button.inline(day[0], b"d1")],[Button.inline(day[1], b"d2")],[Button.inline(day[2], b"d3")],[Button.inline(day[3], b"d4")],[Button.inline(day[4], b"d5")]]
     await bot.send_message(send_event.query.user_id, 'Выбери день', buttons=kbdays)
@@ -43,11 +42,12 @@ async def send_command_handler(send_event):
                 workday["place"] = "HQ"
                 await send_workh.answer()
                 await bot.send_message(send_workh.query.user_id, 'День записан!')
+                await saveday(workday)
                 # Нужно добавить проверку уже существующей записи в файле и предложить изменение или удаление
                 print(workday)
             else:
 
-                # Можно сделать красивый ввод в виде кнопок, но потом
+                # Можно сделать красивый ввод в виде кнопок
                 # Пока что реализую в виде отправки сообщения в формате ЧЧ:ММ
                 #kbshours = [[Button.inline("10:00", b"10:00"), Button.inline("10:30", b"10:30"), Button.inline("11:00", b"11:00"), Button.inline("11:30", b"11:30"), Button.inline("12:00", b"12:00")]
                            # [Button.inline("12:30", b"12:30"), Button.inline("13:00", b"13:00"), Button.inline("13:30", b"13:30"), Button.inline("14:00", b"14:00"), Button.inline("14:30", b"14:30")]]
@@ -62,6 +62,7 @@ async def send_command_handler(send_event):
                         workday["endday"] = str(workend.data)
                         workday["place"] = "HQ"
                         await bot.send_message(send_workh.query.user_id, 'День записан!')
+                        await saveday(workday)
                         # То же, что в комменте в line 46
                         print(workday)
 try:
